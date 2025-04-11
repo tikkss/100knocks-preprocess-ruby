@@ -19,4 +19,4 @@ git clone https://github.com/trueroad/HaranoAjiFonts.git $HOME/.fonts/HaranoAjiF
 bundle install
 
 # Register IRuby
-iruby register --force
+iruby register --force --name ruby
