@@ -17,3 +17,6 @@ git clone https://github.com/trueroad/HaranoAjiFonts.git $HOME/.fonts/HaranoAjiF
 
 # Install gems
 bundle install
+
+# Register IRuby
+iruby register --force
