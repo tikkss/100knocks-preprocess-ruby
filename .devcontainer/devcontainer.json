@@ -22,5 +22,6 @@
     "containerEnv": {
         "TZ": "${localEnv:TZ:UTC}"
     },
-    "onCreateCommand": ".devcontainer/onCreateCommand.sh"
+    "onCreateCommand": ".devcontainer/onCreateCommand.sh",
+    "forwardPorts": [8888]
 }
