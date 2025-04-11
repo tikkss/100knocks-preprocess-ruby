@@ -113,7 +113,7 @@ GitHubアカウントにサインインしている必要があります。
 
   python --version
   jupyter --version
-  jupyter kenelspec list
+  jupyter kernelspec list
 
   quarto --version
   quarto check
