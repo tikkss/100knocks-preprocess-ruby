@@ -15,6 +15,9 @@ echo 'export TZ=Asia/Tokyo' >> $HOME/.profile
 mkdir -p $HOME/.fonts
 git clone https://github.com/trueroad/HaranoAjiFonts.git $HOME/.fonts/HaranoAjiFonts
 
+# Install Matplotlib for charty
+pip3 install matplotlib
+
 # Install gems
 bundle install
 
