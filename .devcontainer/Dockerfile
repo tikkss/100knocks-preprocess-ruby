@@ -55,7 +55,7 @@ ARG USER_GID=$USER_UID
 USER $USERNAME
 
 # Install rbenv
-ARG RBENV_RUBY=3.2.2
+ARG RBENV_RUBY=3.4.2
 RUN set -e; \
     git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv; \
     echo 'eval "$($HOME/.rbenv/bin/rbenv init -)"' >> $HOME/.profile; \
