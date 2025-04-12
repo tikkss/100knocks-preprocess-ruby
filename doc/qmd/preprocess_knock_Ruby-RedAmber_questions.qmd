@@ -11,7 +11,7 @@ lang: ja
 pdf-engine: lualatex
 documentclass: ltjsarticle
 highlight-style: github
-jupyter: ruby3
+jupyter: ruby
 ---
 
 ## はじめに

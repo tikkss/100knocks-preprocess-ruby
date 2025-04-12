@@ -7,6 +7,7 @@
     "features": {
         "ghcr.io/devcontainers/features/python:1": {
             "installTools": true,
+            "enableShared": true,
             "installJupyterlab": true,
             "version": "3.11"
         },
@@ -22,5 +23,6 @@
     "containerEnv": {
         "TZ": "${localEnv:TZ:UTC}"
     },
-    "onCreateCommand": ".devcontainer/onCreateCommand.sh"
+    "onCreateCommand": ".devcontainer/onCreateCommand.sh",
+    "forwardPorts": [8888]
 }
