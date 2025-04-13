@@ -27,7 +27,7 @@ jobs:
       - name: Pre-build image and run make ci-build in dev container
         uses: devcontainers/ci@v0.3
         with:
-          imageName: ghcr.io/heronshoes/100knocks-preprocess-ruby
-          cacheFrom: ghcr.io/heronshoes/100knocks-preprocess-ruby
+          imageName: ghcr.io/tikkss/100knocks-preprocess-ruby
+          cacheFrom: ghcr.io/tikkss/100knocks-preprocess-ruby
           push: always
           runCmd: bundle install && rake test

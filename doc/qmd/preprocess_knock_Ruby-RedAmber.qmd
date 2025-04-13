@@ -7,7 +7,6 @@ format:
     toc-title: Contents
     number-sections: true
     colorlinks: true
-lang: ja
 pdf-engine: lualatex
 documentclass: ltjsarticle
 highlight-style: github
