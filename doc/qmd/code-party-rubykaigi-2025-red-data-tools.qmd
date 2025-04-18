@@ -1,0 +1,201 @@
+---
+title: Code Party RubyKaigi 2025 Red Data Tools
+author: Tsutomu Katsube (@tikkss)
+format:
+  pdf:
+    toc: true
+    toc-title: Contents
+    number-sections: true
+    colorlinks: true
+pdf-engine: lualatex
+documentclass: ltjsarticle
+highlight-style: github
+jupyter: ruby
+---
+
+Red Data Tools プロダクトによるデータ解析
+===
+
+Ruby でもたのしくデータ処理しよう！
+---
+
+Red Data Tools のプロジェクトページはこちら:
+
+* English: https://red-data-tools.github.io/
+* 日本語: https://red-data-tools.github.io/ja/
+
+前準備
+---
+
+このノートブックでは、次の Red Data Tools プロダクトを利用したデータ解析を実演します。
+
+* Red Datasets: よく利用されるオープンなデータセット集を共通の API で利用できる
+* RedAmber: Apache Arrow ベースの高速なデータフレーム
+* Charty: データの可視化をおこなうライブラリー
+
+これらのライブラリがインストールされた環境がそろうリポジトリを用意しています。次のコマンドを実行してリポジトリをローカルにクローンします。
+
+```console
+$ git clone https://github.com/tikkss/100knocks-preprocess-ruby.git
+```
+
+ローカルにクローンしたリポジトリーを、次のコマンドを実行して VS Code で開きます。
+
+```console
+$ code 100knocks-preprocess-ruby
+```
+
+コンテナーで開きます。
+
+左下隅のステータスバーのリモートホスト表示（今はローカルなので「><」の後ろに何もついていない）をクリックします。
+
+するとリモートウィンドウを開くオプションが表示されるので、「Reopen in Container」をクリックします。
+
+コンテナーの構築が開始されます
+
+最初の構築には、数分かかります。
+構築が完了すると、左下隅のステータスバーのリモートホスト表示にコンテナー名が表示されます。
+
+ターミナルを新しく開き、次のコマンドを実行して予め用意してあるノートブックを作成し、 Jupyter Lab を起動します。
+
+```console
+$ rake jupyter
+```
+
+右下隅に表示される Open in Browser をクリックして、ブラウザーから Jupyter Lab を開きます。
+左側に表示されているノートブック一覧から `code-party-rubykaigi-2025-red-data-tools.ipynb` をダブルクリックして開きます。
+
+実演
+---
+
+このノートブックでは Red Datasets で提供されている Penguins データセットを利用します。まずは Red Datasets をロードします。
+
+```{ruby}
+require "datasets"
+```
+
+データセットをリモートから取得します。結果のデータセットは変数 `penguins` に入れます。
+Penguins データセットは、南極のパーマー諸島の３つの島から収集された３種類のペンギンのデータをまとめたものです。
+
+```{ruby}
+penguins = Datasets::Penguins.new
+```
+
+`#each` でデータを取得できます。 1 件だけデータを取得します。
+
+```{ruby}
+penguins.each.first
+```
+
+データ分析するときはデータフレームが便利です。 RedAmber をロードします。
+
+```{ruby}
+require "red_amber"
+```
+
+RedAmber のバックエンドは Apache Arrow 形式なので、
+Apache Arrow 形式に対応した Red Datasets Arrow もロードします。
+
+```{ruby}
+require "datasets-arrow"
+```
+
+データセットからデータフレームを作成します。結果のデータフレームは変数 `df` に入れます。
+
+```{ruby}
+df = RedAmber::DataFrame.new(penguins)
+```
+
+データの全体像をつかむには `#tdr` が便利です。
+
+```{ruby}
+df.tdr
+```
+
+データフレーム全体で 344 行あり、８列（Vectors）あることがわかります。
+それぞれのカラムは次のような構成になっています。
+
+カラム|型|意味
+-----|-----|-----
+species|文字列|ペンギンの種類
+island|文字列|島
+bill_length_mm|倍精度浮動小数点数|くちばしの長さ（mm）
+bill_depth_mm|倍精度浮動小数点数|くちばしの深さ（mm）
+flipper_length_mm|整数|フリッパーの長さ（mm）
+body_mass_g|整数|体重（g）
+sex|文字列|性別
+year|整数|年
+
+全体像がつかめたので、次はデータフレームの先頭 10 行の内容を確認します。
+
+```{ruby}
+df.head(10)
+```
+
+データの統計サマリーをつかむには `#summary` メソッドが便利です。
+
+```{ruby}
+df.summary
+```
+
+body_mass_g カラムはペンギンの体重です。ペンギンの平均体重は約 4,200g で、一番軽いペンギンは 2,700g です。一番重いペンギンは 6,300 g です。
+
+ペンギンの種類ごとの平均体重を図で表します。
+まず、図を描くために Charty をロードします。
+
+```{ruby}
+require "charty"
+```
+
+Charty のバックエンドは Pyplot を使用します。
+Jupyter Notebook で図示できるように IRuby との統合機能を有効化しておきます。
+
+```{ruby}
+Charty::Backends.use(:pyplot)
+Charty::Backends::Pyplot.activate_iruby_integration
+```
+
+これで図を描くための準備が整いました。
+ペンギンの種類毎の平均体重を縦棒グラフで描いてみましょう。
+Charty は RedAmber に対応していませんが、 Apache Arrow 形式には対応しています。
+そのため、RedAmber のメソッド `to_arrow` を呼び出して Apache Arrow 形式に変換したものを Charty に渡します。
+
+```{ruby}
+Charty.bar_plot(data: df.to_arrow, x: :species, y: :body_mass_g)
+```
+
+Gentoo ペンギンが一番重たいことがひと目でわかります。
+オスだけだとどうなんでしょう？同じグラフでオスについて描いてみます。
+
+```{ruby}
+df_male = df.slice {sex == "male"}
+Charty.bar_plot(data: df_male.to_arrow, x: :species, y: :body_mass_g)
+```
+
+さらにメスについても描いてみます。
+
+```{ruby}
+df_female = df.slice {sex == "female"}
+Charty.bar_plot(data: df_female.to_arrow, x: :species, y: :body_mass_g)
+```
+
+オスとメスの違いをわかりやすく可視化するために、それぞれ色を変えて同時に可視化してみます。
+キーワード引数 `color` に、性別カラムを指定してみましょう。
+
+```{ruby}
+Charty.bar_plot(data: df.to_arrow, x: :species, y: :body_mass_g, color: :sex)
+```
+
+オスの方が体重が重たいことがひと目でわかります。
+
+まとめ
+---
+
+このノートブックでは、Penguins データを取得して、データフレームで分析し、可視化までを実践しました。
+Red Data Tools プロダクトを使うと、 Ruby でたのしくデータ処理できます！
+
+私も Ruby 用のデータ処理ツールを開発してみたい！という人は Red Data Tools のチャットに来てください。
+一緒に開発していきましょう！
+
+* English: https://app.element.io/#/room/#red-data-tools-en:matrix.org
+* 日本語: https://app.element.io/#/room/#red-data-tools-ja:matrix.org
